@@ -37,7 +37,7 @@ def preprocess():
 	# Data Preparation
 
 	print("Loading data ...")
-	x_text, y = data_utils.load_data_and_lables(FLAGS.pos_data_file, FLAGS.neg_data_file)
+	x_text, y = data_utils.load_data_and_labels(FLAGS.pos_data_file, FLAGS.neg_data_file)
 
 	# Build Vocabulary
 	max_document_length = max([len(x.split(" ")) for x in x_text])
@@ -80,7 +80,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 			# Keep track of gradient values and sparsity 
 			grad_summaries = []
 			for g,v in grads_and_vars:
-				if(g in not None):
+				if(g is not None):
 					grad_hist_summary = tf.summary.histogram("{}/grad/hist".format(v.name), g)
 					sparsity_summary = tf.summary.scalar("{}/grad/sparsity".format(v.name), tf.nn.zero_fraction(g))
 
@@ -128,9 +128,9 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 				"""
 				feed_dict = {cnn.input_x: x_batch, cnn.input_y: y_batch, cnn.dropout_keep_prob: FLAGS.dropout_keep_prob}
 				_, step, summaries, loss, accuracy = sess.run([train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy], feed_dict)
-				 time_str = datetime.datetime.now().isoformat()
-				 print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-				 train_summary_writer.add_summary(summaries, step)
+				time_str = datetime.datetime.now().isoformat()
+				print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+				train_summary_writer.add_summary(summaries, step)
 
 			def dev_step(x_batch, y_batch, writer=None):
 				"""

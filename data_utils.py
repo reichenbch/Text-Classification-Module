@@ -33,7 +33,7 @@ def load_data_and_labels(pos_data_file, neg_data_file):
 	pos_ex = [s.strip() for s in pos_ex]
 
 	neg_ex = list(open(neg_data_file,"r",encoding="utf-8").readlines())
-	neg_ex = [s.string() for s in neg_ex]
+	neg_ex = [s.strip() for s in neg_ex]
 
 	x_text = pos_ex + neg_ex
 	x_text = [clean_str(sent) for sent in x_text]
@@ -44,8 +44,9 @@ def load_data_and_labels(pos_data_file, neg_data_file):
 	neg_labels = [[1,0] for _ in neg_ex]
 
 	y = np.concatenate([pos_labels, neg_labels],0)
-	data = [x_text,y]
-	data = pd.DataFrame(data,columns=["Text","Label"])
+	data = pd.DataFrame(columns=["Text","Label"])
+	data["Text"] = x_text
+	data["Label"] = y
 	data.to_csv("data_label.csv")
 
 	return [x_text,y]
