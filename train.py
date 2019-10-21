@@ -75,7 +75,8 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 			# Define Training Procedure
 			global_step = tf.Variable(0, name="global_step", trainable = False)
 			optimizer = tf.train.AdamOptimizer(1e-3)
-			grads_and_vars = optimizer.computer_gradients(cnn.loss)
+			#train_check = optimizer.minimize(cnn.loss)
+			grads_and_vars = optimizer.compute_gradients(cnn.loss)
 
 			# Keep track of gradient values and sparsity 
 			grad_summaries = []
@@ -114,6 +115,9 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 			if(not os.path.exists(checkpoint_dir)):
 				os.makedirs(checkpoint_dir)
 
+			if(not os.path.exists(checkpoint_prefix)):
+				os.makedirs(checkpoint_prefix)
+
 			saver = tf.train.Saver(tf.global_variables(), max_to_keep=FLAGS.num_checkpoints)
 
 			# Write vocabulary
@@ -127,7 +131,7 @@ def train(x_train, y_train, vocab_processor, x_dev, y_dev):
 					A single training step
 				"""
 				feed_dict = {cnn.input_x: x_batch, cnn.input_y: y_batch, cnn.dropout_keep_prob: FLAGS.dropout_keep_prob}
-				_, step, summaries, loss, accuracy = sess.run([train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy], feed_dict)
+				step, summaries, loss, accuracy = sess.run([global_step, train_summary_op, cnn.loss, cnn.accuracy], feed_dict)
 				time_str = datetime.datetime.now().isoformat()
 				print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
 				train_summary_writer.add_summary(summaries, step)
